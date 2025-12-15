@@ -1,183 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard</title>
+<title>RedPay Dashboard</title>
 
 <style>
 body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#f2f2f2;
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f2f2f2;
 }
 
-/* CARD WITH ROTATING BORDER */
-.balance-box{
-    position:relative;
-    margin:15px;
-    padding:15px;
-    border-radius:18px;
-    background:#fff;
-    overflow:hidden;
+/* TOP CARD */
+.top-card{
+  margin:15px;
+  padding:20px;
+  border-radius:18px;
+  background:linear-gradient(90deg,#ff3b3b,#c40000);
+  color:#fff;
 }
 
-.balance-box::before{
-    content:"";
-    position:absolute;
-    width:200%;
-    height:200%;
-    background:conic-gradient(
-        transparent,
-        red,
-        transparent
-    );
-    animation:spin 3s linear infinite;
-    top:-50%;
-    left:-50%;
-    z-index:0;
-}
-
-.balance-box::after{
-    content:"";
-    position:absolute;
-    inset:3px;
-    background:#fff;
-    border-radius:15px;
-    z-index:0;
-}
-
-.balance-content{
-    position:relative;
-    z-index:2;
-}
-
-/* BALANCE */
 .balance{
-    font-size:26px;
-    font-weight:bold;
+  font-size:28px;
+  font-weight:bold;
 }
 
-/* BUTTONS */
+.deposit{
+  margin-top:5px;
+  font-size:16px;
+}
+
 .btn{
-    margin-top:10px;
-    padding:10px;
-    border:none;
-    width:100%;
-    border-radius:10px;
-    font-size:16px;
-    font-weight:bold;
-    color:#fff;
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+  border:none;
+  border-radius:12px;
+  font-size:18px;
+  font-weight:bold;
+  color:#fff;
 }
 
-.start{ background:green; }
-.stop{ background:red; }
-.add{ background:#007bff; }
+.start{background:#0a7d00;}
+.stop{background:#b30000;}
+.add{background:#007bff;}
 
-/* TRANSACTION AREA */
-.transaction-title{
-    font-size:18px;
-    font-weight:bold;
-    margin:10px 15px 5px;
+/* TRANSACTION */
+.title{
+  margin:10px 15px;
+  font-size:18px;
+  font-weight:bold;
 }
 
-.transactions{
-    margin:0 15px 15px;
-    background:#fff;
-    border-radius:12px;
-    max-height:260px;
-    overflow-y:auto;
-    padding:10px;
+.list{
+  margin:0 15px 15px;
+  background:#fff;
+  border-radius:15px;
+  padding:10px;
+  max-height:280px;
+  overflow-y:auto;
 }
 
-/* PAYMENT ITEM */
 .tx{
-    background:#e8ffe8;
-    margin-bottom:8px;
-    padding:10px;
-    border-radius:8px;
-    animation:slideIn 0.5s ease;
+  background:#e8ffe8;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:8px;
+  animation:slide 0.4s ease;
 }
 
-@keyframes slideIn{
-    from{ transform:translateX(-100%); opacity:0; }
-    to{ transform:translateX(0); opacity:1; }
-}
-
-@keyframes spin{
-    0%{transform:rotate(0deg);}
-    100%{transform:rotate(360deg);}
+@keyframes slide{
+  from{transform:translateX(-100%);opacity:0;}
+  to{transform:translateX(0);opacity:1;}
 }
 </style>
 </head>
 
 <body>
 
-<div class="balance-box">
-  <div class="balance-content">
-    <div>Available Balance</div>
-    <div class="balance" id="balance">₹0.00</div>
+<div class="top-card">
+  <div>Available Balance</div>
+  <div class="balance" id="bal">₹0.00</div>
+  <div class="deposit">Deposit: ₹10000</div>
 
-    <div style="margin-top:8px;">Deposit: ₹10000</div>
-
-    <button class="btn start" id="startBtn">START</button>
-    <button class="btn stop" id="stopBtn" style="display:none;">STOP</button>
-    <button class="btn add" onclick="manualPayment()">ADD ONE PAYMENT</button>
-  </div>
+  <button class="btn start" id="startBtn">START</button>
+  <button class="btn stop" id="stopBtn" style="display:none;">STOP</button>
+  <button class="btn add" onclick="manual()">ADD ONE PAYMENT</button>
 </div>
 
-<div class="transaction-title">Transaction</div>
+<div class="title">Transaction</div>
+<div class="list" id="list"></div>
 
-<div class="transactions" id="txList"></div>
-
-<!-- BEEP SOUND -->
 <audio id="beep">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
+ <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg">
 </audio>
 
 <script>
-let running=false;
-let balance=0;
-let timer;
+let bal=0, timer;
 
-function randomPayment(){
-    let amount = Math.floor(Math.random()*(4000-1000+1))+1000;
-    let modes=["UPI","NEFT","IMPS","NET"];
-    let mode=modes[Math.floor(Math.random()*modes.length)];
+function payment(){
+  let amt=Math.floor(Math.random()*3000)+1000;
+  let modes=["UPI","NET","NEFT","IMPS"];
+  let mode=modes[Math.floor(Math.random()*modes.length)];
 
-    let d=new Date();
-    let date=("0"+d.getDate()).slice(-2)+"/"+
-             ("0"+(d.getMonth()+1)).slice(-2)+"/"+
-             d.getFullYear();
+  let d=new Date();
+  let date=("0"+d.getDate()).slice(-2)+"/"+
+           ("0"+(d.getMonth()+1)).slice(-2)+"/"+
+           d.getFullYear();
 
-    balance+=amount;
-    document.getElementById("balance").innerText="₹"+balance.toFixed(2);
+  bal+=amt;
+  document.getElementById("bal").innerText="₹"+bal.toFixed(2);
 
-    let div=document.createElement("div");
-    div.className="tx";
-    div.innerHTML=`₹${amount} received via ${mode}<br><small>${date}</small>`;
-    document.getElementById("txList").prepend(div);
+  let div=document.createElement("div");
+  div.className="tx";
+  div.innerHTML=`₹${amt} received via ${mode}<br><small>${date}</small>`;
+  document.getElementById("list").prepend(div);
 
-    document.getElementById("beep").play();
+  document.getElementById("beep").play();
 }
 
 document.getElementById("startBtn").onclick=function(){
-    running=true;
-    this.style.display="none";
-    document.getElementById("stopBtn").style.display="block";
-    timer=setInterval(randomPayment,3000);
-};
+  this.style.display="none";
+  document.getElementById("stopBtn").style.display="block";
+  timer=setInterval(payment,3000);
+}
 
 document.getElementById("stopBtn").onclick=function(){
-    running=false;
-    this.style.display="none";
-    document.getElementById("startBtn").style.display="block";
-    clearInterval(timer);
-};
-
-function manualPayment(){
-    randomPayment();
+  this.style.display="none";
+  document.getElementById("startBtn").style.display="block";
+  clearInterval(timer);
 }
+
+function manual(){ payment(); }
 </script>
 
 </body>
