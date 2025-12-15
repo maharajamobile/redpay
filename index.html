@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,132 +7,279 @@
 
 <style>
 body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#f2f2f2;
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f2f2f2;
 }
 
-/* TOP CARD */
-.top-card{
-  margin:15px;
-  padding:20px;
-  border-radius:18px;
-  background:linear-gradient(90deg,#ff3b3b,#c40000);
-  color:#fff;
+/* HEADER */
+.header{
+    background:linear-gradient(90deg,#ff2a2a,#d81b1b);
+    padding:18px;
+    color:#000;
+    border-bottom-left-radius:25px;
+    border-bottom-right-radius:25px;
+}
+.header-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.logo{
+    font-size:22px;
+    font-weight:bold;
+}
+.tag{
+    background:#fff;
+    padding:8px 14px;
+    border-radius:12px;
+    font-weight:bold;
 }
 
+/* FIXED TOP AREA */
+.fixed-top{
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:#f2f2f2;
+}
+
+/* BALANCE WITH ROTATING RED BORDER */
+.balance-box{
+    position:relative;
+    background:#fff;
+    margin:15px;
+    padding:18px;
+    border-radius:16px;
+    z-index:1;
+}
+.balance-box::before{
+    content:"";
+    position:absolute;
+    inset:-3px;
+    border-radius:20px;
+    background:conic-gradient(
+        red, #ff4b4b, red, #ff4b4b, red
+    );
+    animation:spin 3s linear infinite;
+    z-index:-1;
+}
+@keyframes spin{
+    100%{transform:rotate(360deg);}
+}
+
+.balance-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
 .balance{
-  font-size:28px;
-  font-weight:bold;
+    font-size:34px;
+    font-weight:bold;
+}
+.start-btn{
+    background:#ff4b4b;
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.deposit{
-  margin-top:5px;
-  font-size:16px;
+/* CONTROLS */
+.controls{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
 }
-
 .btn{
-  width:100%;
-  padding:14px;
-  margin-top:12px;
-  border:none;
-  border-radius:12px;
-  font-size:18px;
-  font-weight:bold;
-  color:#fff;
+    flex:1;
+    padding:12px;
+    border-radius:12px;
+    text-align:center;
+    font-weight:bold;
+    background:#fff;
+    border:1px solid #ddd;
+    cursor:pointer;
 }
 
-.start{background:#0a7d00;}
-.stop{background:#b30000;}
-.add{background:#007bff;}
-
-/* TRANSACTION */
-.title{
-  margin:10px 15px;
-  font-size:18px;
-  font-weight:bold;
+/* TRANSACTION TITLE */
+.tx-title{
+    margin:10px 15px;
+    font-size:18px;
+    font-weight:bold;
 }
 
+/* PAYMENT LIST (SCROLL ONLY HERE) */
 .list{
-  margin:0 15px 15px;
-  background:#fff;
-  border-radius:15px;
-  padding:10px;
-  max-height:280px;
-  overflow-y:auto;
+    margin:0 15px 15px;
+    max-height:55vh;
+    overflow-y:auto;
 }
 
-.tx{
-  background:#e8ffe8;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:8px;
-  animation:slide 0.4s ease;
+/* PAYMENT ITEM */
+.item{
+    background:#fff;
+    padding:15px;
+    border-radius:14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+.left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.icon{
+    width:42px;
+    height:42px;
+    background:#ddd;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+.mode{
+    font-size:20px;
+    font-weight:bold;
+}
+.time{
+    font-size:13px;
+    color:#666;
+}
+.amount{
+    font-size:22px;
+    font-weight:bold;
+    color:#e53935;
 }
 
-@keyframes slide{
-  from{transform:translateX(-100%);opacity:0;}
-  to{transform:translateX(0);opacity:1;}
+/* LEFT SLIDE ANIMATION */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.payment-item{
+  animation: slideInLeft 0.5s ease-out;
 }
 </style>
 </head>
 
 <body>
 
-<div class="top-card">
-  <div>Available Balance</div>
-  <div class="balance" id="bal">₹0.00</div>
-  <div class="deposit">Deposit: ₹10000</div>
+<div class="fixed-top">
 
-  <button class="btn start" id="startBtn">START</button>
-  <button class="btn stop" id="stopBtn" style="display:none;">STOP</button>
-  <button class="btn add" onclick="manual()">ADD ONE PAYMENT</button>
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">RedPay • GamingFund</div>
+      <div class="tag">RED PAY - GAMING FUND</div>
+    </div>
+  </div>
+
+  <div class="balance-box">
+    <div>Available Balance</div>
+    <div class="balance-row">
+      <div class="balance">₹ <span id="balance">00</span>.00</div>
+      <div class="start-btn" id="toggleBtn" onclick="toggle()">Start</div>
+    </div>
+
+    <div class="controls">
+      <div class="btn" onclick="manualPayment()">Add one payment</div>
+      <div class="btn" onclick="deposit()">Deposit ₹10,000</div>
+    </div>
+  </div>
+
+  <div class="tx-title">Transaction</div>
+
 </div>
 
-<div class="title">Transaction</div>
 <div class="list" id="list"></div>
 
-<audio id="beep">
- <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg">
+<!-- BEEP SOUND -->
+<audio id="beepSound">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
 </audio>
 
 <script>
-let bal=0, timer;
+let running = false;
+let timer = null;
+let balance = 0;
 
-function payment(){
-  let amt=Math.floor(Math.random()*3000)+1000;
-  let modes=["UPI","NET","NEFT","IMPS"];
-  let mode=modes[Math.floor(Math.random()*modes.length)];
-
-  let d=new Date();
-  let date=("0"+d.getDate()).slice(-2)+"/"+
-           ("0"+(d.getMonth()+1)).slice(-2)+"/"+
-           d.getFullYear();
-
-  bal+=amt;
-  document.getElementById("bal").innerText="₹"+bal.toFixed(2);
-
-  let div=document.createElement("div");
-  div.className="tx";
-  div.innerHTML=`₹${amt} received via ${mode}<br><small>${date}</small>`;
-  document.getElementById("list").prepend(div);
-
-  document.getElementById("beep").play();
+function toggle(){
+  const btn = document.getElementById("toggleBtn");
+  if(!running){
+    running = true;
+    btn.innerText = "Stop";
+    timer = setInterval(addPayment, 2000);
+  }else{
+    running = false;
+    btn.innerText = "Start";
+    clearInterval(timer);
+  }
 }
 
-document.getElementById("startBtn").onclick=function(){
-  this.style.display="none";
-  document.getElementById("stopBtn").style.display="block";
-  timer=setInterval(payment,3000);
+function deposit(){
+  balance += 10000;
+  updateBalance();
+  addEntry("DEPOSIT",10000);
 }
 
-document.getElementById("stopBtn").onclick=function(){
-  this.style.display="none";
-  document.getElementById("startBtn").style.display="block";
-  clearInterval(timer);
+function manualPayment(){
+  addPayment(true);
 }
 
-function manual(){ payment(); }
+function addPayment(force=false){
+  if(!running && !force) return;
+
+  const modes = ["UPI","NET","NEFT","IMPS"];
+  const mode = modes[Math.floor(Math.random()*modes.length)];
+  const amount = Math.floor(Math.random()*3000) + 1000;
+
+  balance += amount;
+  updateBalance();
+  addEntry(mode, amount);
+
+  document.getElementById("beepSound").play();
+}
+
+function addEntry(mode, amount){
+  const now = new Date();
+  const time = now.toLocaleTimeString();
+  const date = getTodayDate();
+
+  const item = document.createElement("div");
+  item.className = "item payment-item";
+  item.innerHTML = `
+    <div class="left">
+      <div class="icon">${mode[0]}</div>
+      <div>
+        <div class="mode">${mode}</div>
+        <div class="time">Payment received • ${date} • ${time}</div>
+      </div>
+    </div>
+    <div class="amount">₹ ${amount}.00</div>
+  `;
+  document.getElementById("list").prepend(item);
+}
+
+function updateBalance(){
+  document.getElementById("balance").innerText = balance;
+}
+
+function getTodayDate(){
+  const d = new Date();
+  const day = String(d.getDate()).padStart(2,'0');
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
 </script>
 
 </body>
