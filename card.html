@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balance Card</title>
+
+<style>
+body{
+  margin:0;
+  padding:20px;
+  background:#f2f2f2;
+  font-family:Arial, sans-serif;
+}
+
+/* MAIN CARD */
+.balance-card{
+  width:100%;
+  max-width:420px;
+  margin:auto;
+  padding:30px 25px;
+  border-radius:25px;
+  background:linear-gradient(90deg,#7b0f0f,#ff0000);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#fff;
+}
+
+/* LEFT & RIGHT BLOCK */
+.block{
+  width:45%;
+}
+
+.title{
+  font-size:22px;
+  font-weight:600;
+  margin-bottom:15px;
+}
+
+.amount{
+  font-size:44px;
+  font-weight:700;
+}
+
+/* CENTER SLASH */
+.slash{
+  width:4px;
+  height:120px;
+  background:#fff;
+  transform:skew(-20deg);
+  border-radius:2px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="balance-card">
+
+  <div class="block">
+    <div class="title">Balance</div>
+    <div class="amount">₹<span id="balance">00.00</span></div>
+  </div>
+
+  <div class="slash"></div>
+
+  <div class="block" style="text-align:right">
+    <div class="title">Commission 12%</div>
+    <div class="amount">₹<span id="commission">00.00</span></div>
+  </div>
+
+</div>
+
+<script>
+function updateValues(){
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+  let commission = balance * 0.12;
+
+  document.getElementById("balance").innerText = balance.toFixed(2);
+  document.getElementById("commission").innerText = commission.toFixed(2);
+}
+
+updateValues();
+setInterval(updateValues, 1000);
+</script>
+
+</body>
+</html>
